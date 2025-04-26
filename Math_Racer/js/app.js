@@ -106,7 +106,7 @@ questionParagraphElement.textContent = challenge.question;
           questionParagraphElement.textContent = 'Try Again!'
           lives = Math.max(0, lives-1);
           livesElement.textContent = lives
-          currentStreak = Math.max(0,currentStreak-1); // when currentStreak = 0; currentStreak = Math.max(0, 0 - 1);
+          currentStreak = Math.max(0,currentStreak-1); 
           currentStreakElement.textContent = currentStreak;
           console.log(lives)
           console.log('Try Again')}
@@ -118,7 +118,33 @@ questionParagraphElement.textContent = challenge.question;
       }
     }
 
-   
+    function nextLevel(){
+      if(score>=50 && score<100){
+        circles.speed=4;
+        markerSettings.Speed = 4;
+        timeLeft = 60;
+        timerElement.textContent = timeLeft;
+        questionParagraphElement.textContent = "Level 2! Timer Reset!";
+        setTimeout(() => {
+        questionParagraphElement.textContent = challenge.question;
+        countDown();
+      },1000); //1 sec delay before showing the next question
+      
+      }
+      if(score>=100){
+        circles.speed=5;
+        markerSettings.Speed = 5;
+        timeLeft = 60;
+        timerElement.textContent = timeLeft;
+        questionParagraphElement.textContent = "Level 3! Timer Reset!";
+        setTimeout(()=>{
+        questionParagraphElement.textContent = challenge.question;
+        countDown();
+        },1000);
+      }
+    }
+
+
     function resetGame() {
       cancelAnimationFrame(startAnimation); //pause animation
       challenge = mathChallenges(); //generates a new challenge
@@ -360,33 +386,13 @@ function drawAll(){
         console.log(`Value is: ${circle.value}`);
         playerAnswer = circle.value;
         compareAnswers();
-        isCollision = false;
-
-        
+        isCollision = false;     
         console.log('PlayerAnswer is' + playerAnswer)
       }
-
-      function nextLevel(){
-        if(score>=50){
-          circles.speed=5;
-          markerSettings.Speed = 5;
-          timeLeft =60;
-          questionParagraphElement.textContent = "Level 2! Timer Reset!";
-        }
-        if(score>=100){
-          circles.speed=8;
-          markerSettings.Speed = 8;
-          timeLeft =60;
-          questionParagraphElement.textContent = "Level 3! Timer Reset!";
-        }
-      }
-      
-
     }
     startAnimation = requestAnimationFrame(drawAll);
     nextLevel()
     endGame()
   }
-
 
 drawAll();
