@@ -66,24 +66,36 @@
 
 <!-- Game Page -->
  <div id="game-page" class="page-hidden">
-  <div id = "game-header">
-    <span id="player-name">Player: </span>
-    <span id="score">🧮 Score: 0</span>
-    <span id="lives">❤️ Lives: 3</span>
-    <span id="timer">⏱️ Time: 60s</span>
-    <span id="winning-streak">🔥Current Streak: 0</span>
-  </div>
+    <div id = "game-header">
+      <span id="player-name">Player: </span>
+      <span>🧮 Score:</span>
+      <span id="score">0</span>
+      <span>❤️ Lives:</span>
+      <span id="lives"> 3</span>
+      <span>⏱️ Time Left:</span>
+      <span id="timer">60s</span>
+      <span>🔥Current Streak:</span>
+      <span id="winning-streak">0</span>
+    </div>
 
-  <div>
-    <canvas id="game-canvas" width="800" height="600"></canvas>
-  </div>
-  <div id="mathQuestionContainer">
-    <div id="mathQuestion">
-      <p id="Question">
-        Math Question
-      </p>
+    <div>
+      <canvas id="game-canvas" width="800" height="600"></canvas>
+      </div>
+        <div id="mathQuestionContainer">
+          <div id="mathQuestion">
+            <p id="Question">
+              Math Question
+            </p>
+          </div>
+        
     </div>
   </div>
-
-
- </div>
+  <div id="gameControls">
+    <button id="pauseBtn">Pause</button>
+    <button id="resetBtn">Reset</button>
+    <button id="quitBtn">Quit</button>
+  </div>
+  <div id="gameMessages">
+    <div id="nextLevelMessage">Congratulations! /br You have unlocked the next level</div>
+  </div>
+  

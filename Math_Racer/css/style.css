@@ -205,14 +205,13 @@ nav a:hover {
   margin: 0 auto;
   border: 3px solid #ff8c42;
   border-radius: 12px;
+  position: relative;
 }
 
 #mathQuestionContainer {
   width: 200px;
   height:50px;
   background-color: white;
-  display: flex;
-  justify-content: center;
   border: 2px solid #ccc;
   font-size: 20px;
   font-weight: bold;
@@ -225,3 +224,20 @@ nav a:hover {
   text-align: center;
   margin-top: 10px;
 }
+
+#gameControls {
+  display: flex;
+  justify-content: center;
+}
+
+#gameControls button {
+  width: 100px;
+  height:50px;
+  background-color: blue;
+  color: whitesmoke;
+  border: 2px solid #ccc;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 15px;
+}
+
