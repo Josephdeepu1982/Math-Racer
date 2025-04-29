@@ -233,11 +233,17 @@ nav a:hover {
 #gameControls button {
   width: 100px;
   height:50px;
-  background-color: blue;
+  background-color: #ff686b;
   color: whitesmoke;
   border: 2px solid #ccc;
   font-size: 20px;
   font-weight: bold;
   border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+#gameControls button:hover  {
+  background-color: #da2323;
+  transform: scale(1.05);
+}

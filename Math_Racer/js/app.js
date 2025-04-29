@@ -1,8 +1,19 @@
 /*-------------------------------- Constants --------------------------------*/
-
+const difficultyEasy = ['+','-']
+const difficultyMedium = ['+','-','*']
+const difficultyHard = ['+','-','*','/']
 
 /*-------------------------------- Variables --------------------------------*/
+let showLandingPage=true;
+let showInstructionsPage=false;
+let showGamePage=false;
 let playerName = '';
+let isDifficultyEasy = false;
+let isDifficultyMedium = false;
+let isDifficultyHard = false;
+let operators = [];
+let question;
+let correctAnswer;
 let playerAnswer;
 let isCollision = false;
 let score = 0;
@@ -10,12 +21,17 @@ let lives = 3;
 let currentStreak = 0;
 let startAnimation;
 let timeLeft = 60;
-let paused = false;
+let paused = true;
 
 /*------------------------ Cached Element References ------------------------*/
-//Player Name
+const difficultySelectElement = document.getElementById("difficulty");
+const landingPage = document.getElementById("landing-page");
+const instructionsPage = document.getElementById("instructions-page" );
+const gamePage = document.getElementById("game-page") 
 const playerNameInputElement = document.getElementById('playerName')
+const namePlayer = document.getElementById("namePlayer")
 const startInstructionsBtnElement = document.getElementById('startInstructionsBtn')
+const startGameBtnElement = document.getElementById('start-game');
 const questionParagraphElement = document.getElementById("Question")
 const scoreElement = document.getElementById("score")
 const currentStreakElement = document.getElementById("winning-streak")
@@ -26,45 +42,111 @@ const resetBtnElement = document.getElementById("resetBtn");
 const quitBtnElement = document.getElementById("quitBtn");
 
 /*-------------------------------- Functions --------------------------------*/
+function loadSite(){
+  if (showLandingPage){
+    landingPage.style.display = 'block';
+    instructionsPage.style.display = 'none';
+    gamePage.style.display = 'none';
+  } else if (showInstructionsPage){
+    landingPage.style.display = 'none';
+    instructionsPage.style.display = 'block';
+    gamePage.style.display = 'none';
+  } else if(showGamePage){
+    landingPage.style.display = 'none';
+    instructionsPage.style.display = 'none';
+    gamePage.style.display = 'block';
+  }
+  }
+  loadSite(); //load site based on flags above
 
-//Capture Player Name
+//Capture Player Name, Difficult level selected & load instructions screen
 handlePlayerInput = () => {
 const nameInput = playerNameInputElement.value
 
 let formattedName = nameInput.trim().toLowerCase().replace(/^\w/,c => c.toUpperCase());
 if (formattedName === '') {
-  playerName = 'Racer'
-}
-playerName = formattedName
+  formattedName = 'Racer'
+} else{
+playerName = formattedName;}
+namePlayer.textContent = formattedName;
 console.log(formattedName)
+
+//update page loading flags
+showInstructionsPage = true;
+showLandingPage = false;
+showGamePage = false;
+
+diffcultySelected()
+loadSite();
 return;
 };
+
+function diffcultySelected(){
+  if (difficultySelectElement.value === "Easy"){
+    operators = [...difficultyEasy];
+  } else if (difficultySelectElement.value === "Medium"){operators = [...difficultyMedium];
+  } else if(difficultySelectElement.value === "Hard"){operators = [...difficultyHard];}
+};
+
+
+function startGame() {
+  showGamePage = true;
+  showInstructionsPage = false;
+  showLandingPage = false;
+  paused = false;
+  loadSite();
+  mathChallenges();
+  drawAll();
+}
 
 //generate random math questions & answers
 
 function mathChallenges () {
 const a = Math.floor(Math.random()*10);
 const b = Math.floor(Math.random()*10);
-const c = a+b;
+let operator = operators[Math.floor(Math.random()*operators.length)];
+
+if(operator === '+'){
+question = `Question ${a}+${b} = ?`
+correctAnswer = a + b;
+} else if (operator === '-'){
+question = `Question ${a}-${b} = ?`
+correctAnswer = a - b;
+} else if (operator === '*'){
+  question = `Question ${a}x${b} = ?`
+  correctAnswer = a * b;
+} else if (operator === '/'){
+  if(b===0){b=1};
+  question = `Question ${a}/${b} = ?`
+  correctAnswer = a / b;}
 
 const wrongAnswers = new Set(); //Set() ensures that all values are unique!. create a set using the Set constructor:
 
 //I want to keep update the set, until I have 3 unique wrong answers. use array.size with set()
 while (wrongAnswers.size<3){
-let wrong = Math.floor(Math.random()*19); //Max a+b is 18
-if (wrong !==c) {
+let wrong;
+if (operator === '+'){
+  wrong = Math.floor(Math.random()*19) //max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
+} else if(operator === '-'){
+  wrong = Math.floor(Math.random()*19)-9 //extremes are -9 and +9
+} else if(operator === '*'){
+  wrong = Math.floor(Math.random()*80) //max possible 9*9 = 81
+} else if(operator === '/') {
+  wrong = Math.floor(Math.random()*10) // max possible is 9/1 = 9
+}
+if(wrong !== correctAnswer) {
   wrongAnswers.add(wrong);
 }
-}
+};
 
 //I want to copy both correct and wrong answers into a single array
 //.sort() => math.random() - 0.5) randomly shuffles the answers in the array
 // math.Random() gives a value between 0 - 1, The compare fucntion of array.sort(return a-b) gives a -ve or +ve number. if -ve the the compare fucntion swaps the two elements; if +ve the compare function does not swap. 
-const answerOptions = [...wrongAnswers,c].sort(() => Math.random() - 0.5);
+const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() - 0.5);
 
     return { 
-      question: `Question ${a}+${b} = ?`,
-      correctAnswer: c,
+      question,
+      correctAnswer,
       options: answerOptions,
     };
 
@@ -174,6 +256,8 @@ questionParagraphElement.textContent = challenge.question;
     }
     countDown()
 
+  
+
     function endGame(){
       if (lives === 0){
         console.log("Game Over");
@@ -231,9 +315,20 @@ questionParagraphElement.textContent = challenge.question;
       
     }
 
+    handleQuitBtn = () => {
+      showInstructionsPage = false;
+      showLandingPage = true;
+      showGamePage = false;
+      loadSite();
+    }
+
 /*----------------------------- Event Listeners -----------------------------*/
 
 startInstructionsBtnElement.addEventListener('click',handlePlayerInput);
+startGameBtnElement.addEventListener('click', startGame);
+pauseBtnElement.addEventListener("click", handlePauseBtn);
+resetBtnElement.addEventListener("click",handleResetBtn);
+quitBtnElement.addEventListener("click",handleQuitBtn);
 
 document.addEventListener("keydown", (event) => {
   const keysToPrevent = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
@@ -242,8 +337,7 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault(); // stops page scrolling!
   }});
 
-pauseBtnElement.addEventListener("click", handlePauseBtn);
-resetBtnElement.addEventListener("click",handleResetBtn)
+
 
 /*---------------------------------- Canvas ----------------------------------*/
 const canvas = document.getElementById("game-canvas");
@@ -395,4 +489,4 @@ function drawAll(){
     endGame()
   }
 
-drawAll();
+//drawAll();
