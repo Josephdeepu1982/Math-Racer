@@ -1,12 +1,13 @@
 /*-------------------------------- Constants --------------------------------*/
-const difficultyEasy = ['+','-']
-const difficultyMedium = ['+','-','*']
-const difficultyHard = ['+','-','*','/']
+const difficultyEasy = ['+']
+const difficultyMedium = ['+','-']
+const difficultyHard = ['+','-','*']
 
 /*-------------------------------- Variables --------------------------------*/
 let showLandingPage=true;
 let showInstructionsPage=false;
 let showGamePage=false;
+let displaySummaryPage = false;
 let playerName = '';
 let isDifficultyEasy = false;
 let isDifficultyMedium = false;
@@ -21,7 +22,11 @@ let lives = 3;
 let currentStreak = 0;
 let startAnimation;
 let timeLeft = 60;
-let paused = true;
+let paused = false;
+let correctAnswers = [];
+let wrongAnswers = []
+let gameOver = false;
+
 
 /*------------------------ Cached Element References ------------------------*/
 const difficultySelectElement = document.getElementById("difficulty");
@@ -40,6 +45,11 @@ const livesElement = document.getElementById("lives");
 const pauseBtnElement = document.getElementById("pauseBtn");
 const resetBtnElement = document.getElementById("resetBtn");
 const quitBtnElement = document.getElementById("quitBtn");
+const summaryPage = document.getElementById("summary-page");
+const totalPoints = document.getElementById("total-points");
+const correctAnswersList = document.getElementById('correct-answers-list');
+const wrongAnswersList = document.getElementById('wrong-answers-list');
+const restartButtonElement = document.getElementById("restartBtn");
 
 /*-------------------------------- Functions --------------------------------*/
 function loadSite(){
@@ -47,14 +57,22 @@ function loadSite(){
     landingPage.style.display = 'block';
     instructionsPage.style.display = 'none';
     gamePage.style.display = 'none';
+    summaryPage.style.display = 'none';
   } else if (showInstructionsPage){
     landingPage.style.display = 'none';
     instructionsPage.style.display = 'block';
     gamePage.style.display = 'none';
+    summaryPage.style.display = 'none';
   } else if(showGamePage){
     landingPage.style.display = 'none';
     instructionsPage.style.display = 'none';
     gamePage.style.display = 'block';
+    summaryPage.style.display = 'none';
+  } else if(displaySummaryPage){
+    landingPage.style.display = 'none';
+    instructionsPage.style.display = 'none';
+    gamePage.style.display = 'none';
+    summaryPage.style.display = 'block';
   }
   }
   loadSite(); //load site based on flags above
@@ -75,6 +93,7 @@ console.log(formattedName)
 showInstructionsPage = true;
 showLandingPage = false;
 showGamePage = false;
+displaySummaryPage = false;
 
 diffcultySelected()
 loadSite();
@@ -82,10 +101,11 @@ return;
 };
 
 function diffcultySelected(){
-  if (difficultySelectElement.value === "Easy"){
+  if (difficultySelectElement.value === "easy"){
     operators = [...difficultyEasy];
-  } else if (difficultySelectElement.value === "Medium"){operators = [...difficultyMedium];
-  } else if(difficultySelectElement.value === "Hard"){operators = [...difficultyHard];}
+  } else if (difficultySelectElement.value === "medium"){operators = [...difficultyMedium];
+  } else if(difficultySelectElement.value === "hard"){operators = [...difficultyHard];}
+  console.log(operators);
 };
 
 
@@ -93,18 +113,20 @@ function startGame() {
   showGamePage = true;
   showInstructionsPage = false;
   showLandingPage = false;
+  displaySummaryPage = false;
   paused = false;
   loadSite();
   mathChallenges();
+  countDown()
   drawAll();
 }
 
-//generate random math questions & answers
 
 function mathChallenges () {
 const a = Math.floor(Math.random()*10);
 const b = Math.floor(Math.random()*10);
 let operator = operators[Math.floor(Math.random()*operators.length)];
+if(!operator){operator = '+'};
 
 if(operator === '+'){
 question = `Question ${a}+${b} = ?`
@@ -115,29 +137,26 @@ correctAnswer = a - b;
 } else if (operator === '*'){
   question = `Question ${a}x${b} = ?`
   correctAnswer = a * b;
-} else if (operator === '/'){
-  if(b===0){b=1};
-  question = `Question ${a}/${b} = ?`
-  correctAnswer = a / b;}
+} 
 
 const wrongAnswers = new Set(); //Set() ensures that all values are unique!. create a set using the Set constructor:
 
 //I want to keep update the set, until I have 3 unique wrong answers. use array.size with set()
-while (wrongAnswers.size<3){
+
+while (wrongAnswers.size<3){ //counter prevents infinite loop
 let wrong;
+
 if (operator === '+'){
   wrong = Math.floor(Math.random()*19) //max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
 } else if(operator === '-'){
   wrong = Math.floor(Math.random()*19)-9 //extremes are -9 and +9
 } else if(operator === '*'){
   wrong = Math.floor(Math.random()*80) //max possible 9*9 = 81
-} else if(operator === '/') {
-  wrong = Math.floor(Math.random()*10) // max possible is 9/1 = 9
+} 
+if(wrong !== correctAnswer && wrong >= 0) { 
+  wrongAnswers.add(Math.floor(wrong)); //ensures answers are integers
 }
-if(wrong !== correctAnswer) {
-  wrongAnswers.add(wrong);
 }
-};
 
 //I want to copy both correct and wrong answers into a single array
 //.sort() => math.random() - 0.5) randomly shuffles the answers in the array
@@ -151,6 +170,8 @@ const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() -
     };
 
 };
+
+
 
 let challenge = mathChallenges(); //save question, answer and wrongoptions to a variable that contains an object {question:xxx, correctAnswer: c, options: [x,y,z,c]}
 console.log(challenge.correctAnswer);
@@ -167,7 +188,7 @@ questionParagraphElement.textContent = challenge.question;
     function compareAnswers(){
       if(isCollision){
         if (playerAnswer === challenge.correctAnswer){
-          
+          correctAnswers.push(challenge.question);
           currentStreak +=1;
           score+=10
 
@@ -175,57 +196,63 @@ questionParagraphElement.textContent = challenge.question;
           currentStreakElement.textContent = currentStreak;
           questionParagraphElement.textContent = 'Good Job!';
 
-          console.log ("Good Job!");
-          console.log(score)
-
-          
           setTimeout(()=>{
             resetGame();
             drawAll(); //restart animation
+            nextLevel();
           },1000);
 
         } else if (playerAnswer !== challenge.correctAnswer){
+          wrongAnswers.push(challenge.question);
           questionParagraphElement.textContent = 'Try Again!'
           lives = Math.max(0, lives-1);
           livesElement.textContent = lives
           currentStreak = Math.max(0,currentStreak-1); 
           currentStreakElement.textContent = currentStreak;
-          console.log(lives)
-          console.log('Try Again')}
 
           setTimeout(()=>{
             resetGame();
             drawAll(); //restart animation
           },1000);
-      }
-    }
+        }}
+      };
 
     function nextLevel(){
       if(score>=50 && score<100){
+        circles.speed=3;
+        markerSettings.Speed = 3;
+        timeLeft = 60;
+        timerElement.textContent = timeLeft;
+        paused = false;
+        
+        questionParagraphElement.textContent = "Level 2! Timer Reset!";
+        //cancelAnimationFrame(startAnimation); //pause animation
+
+        setTimeout(() => {
+        questionParagraphElement.textContent = challenge.question;
+        //startAnimation = requestAnimationFrame(drawAll); 
+        //countDown()
+      },1000); //1 sec delay before showing the next question
+      console.log("Circles speed: " + circles.speed)
+      }
+      if(score>=100){
         circles.speed=4;
         markerSettings.Speed = 4;
         timeLeft = 60;
         timerElement.textContent = timeLeft;
-        questionParagraphElement.textContent = "Level 2! Timer Reset!";
-        setTimeout(() => {
-        questionParagraphElement.textContent = challenge.question;
-        countDown();
-      },1000); //1 sec delay before showing the next question
-      
-      }
-      if(score>=100){
-        circles.speed=5;
-        markerSettings.Speed = 5;
-        timeLeft = 60;
-        timerElement.textContent = timeLeft;
+        paused = false;
+        
         questionParagraphElement.textContent = "Level 3! Timer Reset!";
+        //cancelAnimationFrame(startAnimation); //pause animation
+      
         setTimeout(()=>{
         questionParagraphElement.textContent = challenge.question;
-        countDown();
+        //startAnimation = requestAnimationFrame(drawAll); 
+        //countDown()
         },1000);
       }
     }
-
+    nextLevel();
 
     function resetGame() {
       cancelAnimationFrame(startAnimation); //pause animation
@@ -250,25 +277,31 @@ questionParagraphElement.textContent = challenge.question;
         timeLeft -=1;
         setTimeout(countDown,1000);
         timerElement.textContent = timeLeft
+        console.log('Timeleft:' + timeLeft);
       } else {
         endGame();
       }
     }
-    countDown()
+    //countDown()
 
   
 
     function endGame(){
-      if (lives === 0){
+      if (!gameOver && lives === 0){
+        gameOver = true;
         console.log("Game Over");
         cancelAnimationFrame(startAnimation); //pause animation
         questionParagraphElement.textContent = "Game Over!";
+        paused = true;
+        showSummaryPage();
         return;
       } 
-      if(timeLeft === 0){
+      if(!gameOver && timeLeft === 0){
+        gameOver = true;
         console.log("Time's Up!");
         cancelAnimationFrame(startAnimation); //pause animation
         questionParagraphElement.textContent = "Time's Up!";
+        showSummaryPage();
         return;
       }
     }
@@ -319,8 +352,42 @@ questionParagraphElement.textContent = challenge.question;
       showInstructionsPage = false;
       showLandingPage = true;
       showGamePage = false;
+      displaySummaryPage = false;
+      //paused = false;
+      score = 0;
+      lives = 3;
+      currentStreak = 0;
+      timeLeft = 60;
+      isCollision = false;
+      scoreElement.textContent = score;
+      currentStreakElement.textContent = currentStreak;
+      livesElement.textContent = lives;
+      timerElement.textContent = timeLeft;
+      questionParagraphElement.textContent = "Game Reset";
+      cancelAnimationFrame(startAnimation);
       loadSite();
     }
+
+    function showSummaryPage(){
+      gamePage.style.display = 'none';
+      summaryPage.style.display = 'block';
+      totalPoints.textContent = score;
+
+
+      correctAnswers.forEach(answer => {
+      const li = document.createElement('li');
+      li.textContent = answer;
+      correctAnswersList.appendChild(li);
+      });
+  
+      wrongAnswers.forEach(answer => {
+      const li = document.createElement('li');
+      li.textContent = answer;
+      wrongAnswersList.appendChild(li);
+      });
+      console.log('Summary page shown!');
+      }
+  
 
 /*----------------------------- Event Listeners -----------------------------*/
 
@@ -337,7 +404,30 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault(); // stops page scrolling!
   }});
 
-
+  restartButtonElement.addEventListener('click',() => {
+    showInstructionsPage = false;
+    showLandingPage = false;
+    showGamePage = true;
+    displaySummaryPage = false;
+    score = 0;
+    lives = 3;
+    currentStreak = 0;
+    timeLeft = 60;
+    isCollision = false;
+    correctAnswers = [];
+    wrongAnswers = [];
+    scoreElement.textContent = score;
+    currentStreakElement.textContent = currentStreak;
+    livesElement.textContent = lives;
+    timerElement.textContent = timeLeft;
+    questionParagraphElement.textContent = "Game Reset";
+    cancelAnimationFrame(startAnimation);
+    loadSite();
+    startAnimation = requestAnimationFrame(drawAll); 
+    countDown();
+    endGame();
+  }
+);
 
 /*---------------------------------- Canvas ----------------------------------*/
 const canvas = document.getElementById("game-canvas");
@@ -485,7 +575,7 @@ function drawAll(){
       }
     }
     startAnimation = requestAnimationFrame(drawAll);
-    nextLevel()
+    //nextLevel()
     endGame()
   }
 

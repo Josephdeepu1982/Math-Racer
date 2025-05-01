@@ -247,3 +247,54 @@ nav a:hover {
   background-color: #da2323;
   transform: scale(1.05);
 }
+
+/* summary page styling*/
+#summary-page {
+  width: 90%;
+  max-width: 500px;
+  margin: 40px auto; 
+  padding: 20px;
+  border: 2px solid #ffa69e;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  background-color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+  flex-direction: column;
+  align-items: center;  
+  text-align: center;   
+}
+#summary-page h2 {
+  margin-bottom: 20px; 
+  color: #da2323;
+}
+#summary-page p {
+  margin: 15px 0;   
+}
+#summary-page .summary-section {
+  margin-top: 20px;    
+}
+#summary-page ul {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+}
+#summary-page li{
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #333;
+}
+#summary-page button{
+  background-color: #ff686b;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px; 
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#summary-page button:hover {
+    background-color: #da2323;
+    transform: scale(1.05);
+}
+  
