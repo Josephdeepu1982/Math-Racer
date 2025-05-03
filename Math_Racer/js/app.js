@@ -189,6 +189,7 @@ questionParagraphElement.textContent = challenge.question;
 
     
     function compareAnswers(){
+      if (!challenge) return; // Prevents error if challenge is null
       if(isCollision){
         if (playerAnswer === challenge.correctAnswer){
           correctAnswers.push(challenge.question);
@@ -334,6 +335,8 @@ questionParagraphElement.textContent = challenge.question;
         isCollision = false;
         gameOver = false;
         currentLevel = 1;
+        circles.speed = 2;
+        markerSettings.Speed = 2;
         operators = [];
         challenge = null;
         correctAnswers = [];
@@ -363,6 +366,7 @@ questionParagraphElement.textContent = challenge.question;
 
     handleResetBtn = () => {
       resetGameState();
+      renderLevel();
       resetGame();
       drawAll();
       countDown();
@@ -376,6 +380,7 @@ questionParagraphElement.textContent = challenge.question;
       paused = true;
       clearTimeout(countdownTimerId); // Stop timer
       resetGameState();
+      renderLevel();
       loadSite();
     }
 
@@ -436,6 +441,8 @@ document.addEventListener("keydown", (event) => {
     showGamePage = true;
     displaySummaryPage = false;
     resetGameState();
+    renderLevel();
+    resetGame();
     startAnimation = requestAnimationFrame(drawAll); 
     countDown();
     endGame();
