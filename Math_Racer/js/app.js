@@ -55,60 +55,63 @@ const homePageBtnElement = document.getElementById("homePageBtn");
 
 /*-------------------------------- Functions --------------------------------*/
 //function to hide/show pages 
-  function loadSite(){
-      if (showLandingPage){
-          landingPage.style.display = 'block';
-          instructionsPage.style.display = 'none';
-          gamePage.style.display = 'none';
-          summaryPage.style.display = 'none';
-      } else if (showInstructionsPage){
-          landingPage.style.display = 'none';
-          instructionsPage.style.display = 'block';
-          gamePage.style.display = 'none';
-          summaryPage.style.display = 'none';
-      } else if(showGamePage){
-          landingPage.style.display = 'none';
-          instructionsPage.style.display = 'none';
-          gamePage.style.display = 'block';
-          summaryPage.style.display = 'none';
-      } else if(displaySummaryPage){
-          landingPage.style.display = 'none';
-          instructionsPage.style.display = 'none';
-          gamePage.style.display = 'none';
-          summaryPage.style.display = 'block';
-      }
+function loadSite(){
+    if (showLandingPage){
+        landingPage.style.display = 'block';
+        instructionsPage.style.display = 'none';
+        gamePage.style.display = 'none';
+        summaryPage.style.display = 'none';
+    } else if (showInstructionsPage){
+        landingPage.style.display = 'none';
+        instructionsPage.style.display = 'block';
+        gamePage.style.display = 'none';
+        summaryPage.style.display = 'none';
+    } else if(showGamePage){
+        landingPage.style.display = 'none';
+        instructionsPage.style.display = 'none';
+        gamePage.style.display = 'block';
+        summaryPage.style.display = 'none';
+    } else if(displaySummaryPage){
+        landingPage.style.display = 'none';
+        instructionsPage.style.display = 'none';
+        gamePage.style.display = 'none';
+        summaryPage.style.display = 'block';
     }
-    loadSite(); //load site based on flags above
+  }
+  loadSite(); //load site based on flags above
 
 //Capture Player Name, Difficulty selected & load instructions screen
 handlePlayerInput = () => {
-const nameInput = playerNameInputElement.value
+  const nameInput = playerNameInputElement.value
 
-let formattedName = nameInput.trim().toLowerCase().replace(/^\w/,c => c.toUpperCase());
-if (formattedName === '') {
-  formattedName = 'Racer'
-} else{
-playerName = formattedName;}
-namePlayer.textContent = formattedName;
-console.log(formattedName)
+  let formattedName = nameInput.trim().toLowerCase().replace(/^\w/,c  => c.toUpperCase());
+    if (formattedName === '') {
+      formattedName = 'Racer'
+    } else{
+    playerName = formattedName;}
+    namePlayer.textContent = formattedName;
+    console.log(formattedName)
 
-//update page loading flags
-showInstructionsPage = true;
-showLandingPage = false;
-showGamePage = false;
-displaySummaryPage = false;
+    //update page loading flags
+    showInstructionsPage = true;
+    showLandingPage = false;
+    showGamePage = false;
+    displaySummaryPage = false;
 
-diffcultySelected()
-loadSite();
-return;
+    diffcultySelected()
+    loadSite();
+    return;
 };
 
+//Copy over appropreate difficuulty array
 function diffcultySelected(){
   if (difficultySelectElement.value === "easy"){
     operators = [...difficultyEasy];
-  } else if (difficultySelectElement.value === "medium"){operators = [...difficultyMedium];
-  } else if(difficultySelectElement.value === "hard"){operators = [...difficultyHard];}
-  console.log(operators);
+  } else if (difficultySelectElement.value === "medium"){
+    operators = [...difficultyMedium];
+  } else if(difficultySelectElement.value === "hard"){
+    operators = [...difficultyHard];
+  }
 };
 
 
