@@ -483,7 +483,7 @@ const car = {
 }
 
 const carImage = new Image();
-carImage.src = './Resources/Car.png';
+carImage.src = './Math_Racer/Resources/Car.png';
 
 document.addEventListener("keydown",(event) => {
   if(event.key === "ArrowLeft"){
