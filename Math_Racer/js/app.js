@@ -54,33 +54,33 @@ const restartButtonElement = document.getElementById("restartBtn");
 const homePageBtnElement = document.getElementById("homePageBtn");
 
 /*-------------------------------- Functions --------------------------------*/
-//hide
-function loadSite(){
-  if (showLandingPage){
-    landingPage.style.display = 'block';
-    instructionsPage.style.display = 'none';
-    gamePage.style.display = 'none';
-    summaryPage.style.display = 'none';
-  } else if (showInstructionsPage){
-    landingPage.style.display = 'none';
-    instructionsPage.style.display = 'block';
-    gamePage.style.display = 'none';
-    summaryPage.style.display = 'none';
-  } else if(showGamePage){
-    landingPage.style.display = 'none';
-    instructionsPage.style.display = 'none';
-    gamePage.style.display = 'block';
-    summaryPage.style.display = 'none';
-  } else if(displaySummaryPage){
-    landingPage.style.display = 'none';
-    instructionsPage.style.display = 'none';
-    gamePage.style.display = 'none';
-    summaryPage.style.display = 'block';
-  }
-  }
-  loadSite(); //load site based on flags above
+//function to hide/show pages 
+  function loadSite(){
+      if (showLandingPage){
+          landingPage.style.display = 'block';
+          instructionsPage.style.display = 'none';
+          gamePage.style.display = 'none';
+          summaryPage.style.display = 'none';
+      } else if (showInstructionsPage){
+          landingPage.style.display = 'none';
+          instructionsPage.style.display = 'block';
+          gamePage.style.display = 'none';
+          summaryPage.style.display = 'none';
+      } else if(showGamePage){
+          landingPage.style.display = 'none';
+          instructionsPage.style.display = 'none';
+          gamePage.style.display = 'block';
+          summaryPage.style.display = 'none';
+      } else if(displaySummaryPage){
+          landingPage.style.display = 'none';
+          instructionsPage.style.display = 'none';
+          gamePage.style.display = 'none';
+          summaryPage.style.display = 'block';
+      }
+    }
+    loadSite(); //load site based on flags above
 
-//Capture Player Name, Difficult level selected & load instructions screen
+//Capture Player Name, Difficulty selected & load instructions screen
 handlePlayerInput = () => {
 const nameInput = playerNameInputElement.value
 
