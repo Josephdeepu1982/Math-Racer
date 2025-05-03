@@ -24,7 +24,7 @@ An interactive math game designed to make learning fun for preschoolers! Players
 ---
 
 ## 🚀 Getting Started  
-Play the game here 👉 [Launch Math Racer](https://josephdeepu1982.github.io/Math-Racer/).
+Play the game here 👉 Launch Math Racer
 
 ---
 
@@ -65,6 +65,4 @@ Presentation Material: [Google Slides](https://docs.google.com/presentation/d/1C
 
 ---
 
-Happy Racing! 🏁 
-
----
+Happy Racing! 🏁
