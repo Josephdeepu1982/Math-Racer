@@ -37,14 +37,27 @@
             <label for="playerName"> Enter Your Name:</label>
             <input id="playerName" type="text" placeholder="name"/>
 
-            <label for="difficulty">Choose Difficulty:</label>
-              <select id = 'difficulty'>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
+            <div class="difficulty-label">
+              <label for="difficulty">Choose Difficulty:</label>
+              <span class="tooltip-icon">ℹ️
+                <span class="tooltip-text">
+                  <strong>Easy</strong>: Only addition<br>
+                  <strong>Medium</strong>: Add & subtract<br>
+                  <strong>Hard</strong>: Add, subtract, multiply
+                </span>
+              </span>
+            </div>
+            
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+            
+
               <button id="startInstructionsBtn" onclick="handlePlayerInput()">Let's Go!</button>
-          </div>
+         
+            </div>
         </div>
       </div>
 
@@ -75,6 +88,9 @@
         <span id="timer">60s</span>
         <span>🔥Current Streak:</span>
         <span id="winning-streak">0</span>
+        <span>Current Level:</span>
+        <span id="level-container">⭐</span>
+
       </div>
 
       <div>
@@ -106,6 +122,7 @@
       <ul id="wrong-answers-list"></ul>
     </div>
     <button id="restartBtn">Restart Game</button>
+    <button id="homePageBtn">Home Page</button>
   </div>
 
   </body>
