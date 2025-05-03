@@ -4,14 +4,15 @@ const difficultyMedium = ['+','-']
 const difficultyHard = ['+','-','*']
 
 /*-------------------------------- Variables --------------------------------*/
-let showLandingPage=true;
-let showInstructionsPage=false;
-let showGamePage=false;
+let showLandingPage = true;
+let showInstructionsPage = false;
+let showGamePage = false;
 let displaySummaryPage = false;
 let playerName = '';
 let isDifficultyEasy = false;
 let isDifficultyMedium = false;
 let isDifficultyHard = false;
+let currentLevel = 1;
 let operators = [];
 let question;
 let correctAnswer;
@@ -26,7 +27,7 @@ let paused = false;
 let correctAnswers = [];
 let wrongAnswers = []
 let gameOver = false;
-
+let countdownTimerId;
 
 /*------------------------ Cached Element References ------------------------*/
 const difficultySelectElement = document.getElementById("difficulty");
@@ -50,8 +51,10 @@ const totalPoints = document.getElementById("total-points");
 const correctAnswersList = document.getElementById('correct-answers-list');
 const wrongAnswersList = document.getElementById('wrong-answers-list');
 const restartButtonElement = document.getElementById("restartBtn");
+const homePageBtnElement = document.getElementById("homePageBtn");
 
 /*-------------------------------- Functions --------------------------------*/
+//hide
 function loadSite(){
   if (showLandingPage){
     landingPage.style.display = 'block';
@@ -168,7 +171,7 @@ const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() -
       correctAnswer,
       options: answerOptions,
     };
-
+    
 };
 
 
@@ -191,6 +194,7 @@ questionParagraphElement.textContent = challenge.question;
           correctAnswers.push(challenge.question);
           currentStreak +=1;
           score+=10
+          fiveStreak();
 
           scoreElement.textContent = score;
           currentStreakElement.textContent = currentStreak;
@@ -207,7 +211,8 @@ questionParagraphElement.textContent = challenge.question;
           questionParagraphElement.textContent = 'Try Again!'
           lives = Math.max(0, lives-1);
           livesElement.textContent = lives
-          currentStreak = Math.max(0,currentStreak-1); 
+          //currentStreak = Math.max(0,currentStreak-1); 
+          currentStreak = 0;
           currentStreakElement.textContent = currentStreak;
 
           setTimeout(()=>{
@@ -218,14 +223,16 @@ questionParagraphElement.textContent = challenge.question;
       };
 
     function nextLevel(){
-      if(score>=50 && score<100){
-        circles.speed=3;
+      if(score>=50 && currentLevel === 1){
+        currentLevel = 2;
+        renderLevel();
+        circles.speed = 3;
         markerSettings.Speed = 3;
         timeLeft = 60;
         timerElement.textContent = timeLeft;
         paused = false;
         
-        questionParagraphElement.textContent = "Level 2! Timer Reset!";
+        //questionParagraphElement.textContent = "Level 2! Timer Reset!";
         //cancelAnimationFrame(startAnimation); //pause animation
 
         setTimeout(() => {
@@ -233,16 +240,16 @@ questionParagraphElement.textContent = challenge.question;
         //startAnimation = requestAnimationFrame(drawAll); 
         //countDown()
       },1000); //1 sec delay before showing the next question
-      console.log("Circles speed: " + circles.speed)
-      }
-      if(score>=100){
+      } else if(score>=100 && currentLevel === 2){
+        currentLevel = 3;
+        renderLevel();
         circles.speed=4;
         markerSettings.Speed = 4;
         timeLeft = 60;
         timerElement.textContent = timeLeft;
         paused = false;
         
-        questionParagraphElement.textContent = "Level 3! Timer Reset!";
+        //questionParagraphElement.textContent = "Level 3! Timer Reset!";
         //cancelAnimationFrame(startAnimation); //pause animation
       
         setTimeout(()=>{
@@ -252,7 +259,7 @@ questionParagraphElement.textContent = challenge.question;
         },1000);
       }
     }
-    nextLevel();
+    //nextLevel();
 
     function resetGame() {
       cancelAnimationFrame(startAnimation); //pause animation
@@ -275,8 +282,9 @@ questionParagraphElement.textContent = challenge.question;
       }
       if(timeLeft>0){
         timeLeft -=1;
-        setTimeout(countDown,1000);
+
         timerElement.textContent = timeLeft
+        countdownTimerId = setTimeout(countDown,1000);
         console.log('Timeleft:' + timeLeft);
       } else {
         endGame();
@@ -308,14 +316,39 @@ questionParagraphElement.textContent = challenge.question;
 
 
     function fiveStreak(){
-      if(currentStreak===5){
-        lives+=1;
+      if(currentStreak === 5){
+        lives += 1;
+        livesElement.textContent = lives;
+        currentStreak = 0;
         questionParagraphElement.textContent = "Life Added!";
-      }
+        console.log('Added lives is:' + lives)
+      } 
     }
 
+    function resetGameState(){
+        score = 0;
+        lives = 3;
+        timeLeft = 60;
+        currentStreak = 0;
+        paused = false;
+        isCollision = false;
+        gameOver = false;
+        currentLevel = 1;
+        operators = [];
+        challenge = null;
+        correctAnswers = [];
+        wrongAnswers = [];
+        scoreElement.textContent = score;
+        currentStreakElement.textContent = currentStreak;
+        livesElement.textContent = lives;
+        timerElement.textContent = timeLeft;
+        cancelAnimationFrame(startAnimation);
+        clearTimeout(countdownTimerId); 
+        loadSite();
+    }
+
+
     handlePauseBtn = () => {
-      
       if(!paused){
         cancelAnimationFrame(startAnimation); //pause animation
         paused = true;
@@ -329,23 +362,10 @@ questionParagraphElement.textContent = challenge.question;
       };
 
     handleResetBtn = () => {
-      
-      cancelAnimationFrame(startAnimation);
-      score = 0;
-      lives = 3;
-      currentStreak = 0;
-      timeLeft = 60;
-      paused = false;
-      isCollision = false;
-      scoreElement.textContent = score;
-      currentStreakElement.textContent = currentStreak;
-      livesElement.textContent = lives;
-      timerElement.textContent = timeLeft;
-      
+      resetGameState();
       resetGame();
       drawAll();
-      questionParagraphElement.textContent = "Game Reset";
-      
+      countDown();
     }
 
     handleQuitBtn = () => {
@@ -353,26 +373,17 @@ questionParagraphElement.textContent = challenge.question;
       showLandingPage = true;
       showGamePage = false;
       displaySummaryPage = false;
-      //paused = false;
-      score = 0;
-      lives = 3;
-      currentStreak = 0;
-      timeLeft = 60;
-      isCollision = false;
-      scoreElement.textContent = score;
-      currentStreakElement.textContent = currentStreak;
-      livesElement.textContent = lives;
-      timerElement.textContent = timeLeft;
-      questionParagraphElement.textContent = "Game Reset";
-      cancelAnimationFrame(startAnimation);
+      paused = true;
+      clearTimeout(countdownTimerId); // Stop timer
+      resetGameState();
       loadSite();
     }
 
     function showSummaryPage(){
       gamePage.style.display = 'none';
       summaryPage.style.display = 'block';
+      
       totalPoints.textContent = score;
-
 
       correctAnswers.forEach(answer => {
       const li = document.createElement('li');
@@ -389,6 +400,18 @@ questionParagraphElement.textContent = challenge.question;
       }
   
 
+      function renderLevel() {
+          const levelContainer = document.getElementById('level-container');
+            levelContainer.innerHTML = '';
+            for (let i = 0; i < currentLevel; i++) {
+            const star = document.createElement('span');
+            star.textContent = '⭐';
+            levelContainer.appendChild(star);
+          }
+        }
+        
+
+
 /*----------------------------- Event Listeners -----------------------------*/
 
 startInstructionsBtnElement.addEventListener('click',handlePlayerInput);
@@ -396,6 +419,9 @@ startGameBtnElement.addEventListener('click', startGame);
 pauseBtnElement.addEventListener("click", handlePauseBtn);
 resetBtnElement.addEventListener("click",handleResetBtn);
 quitBtnElement.addEventListener("click",handleQuitBtn);
+homePageBtnElement.addEventListener("click",handleQuitBtn);
+// const quitBtnElement = document.getElementById("quitBtn");
+// const homePageBtnElement = document.getElementById("homePageBtn");
 
 document.addEventListener("keydown", (event) => {
   const keysToPrevent = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
@@ -409,20 +435,7 @@ document.addEventListener("keydown", (event) => {
     showLandingPage = false;
     showGamePage = true;
     displaySummaryPage = false;
-    score = 0;
-    lives = 3;
-    currentStreak = 0;
-    timeLeft = 60;
-    isCollision = false;
-    correctAnswers = [];
-    wrongAnswers = [];
-    scoreElement.textContent = score;
-    currentStreakElement.textContent = currentStreak;
-    livesElement.textContent = lives;
-    timerElement.textContent = timeLeft;
-    questionParagraphElement.textContent = "Game Reset";
-    cancelAnimationFrame(startAnimation);
-    loadSite();
+    resetGameState();
     startAnimation = requestAnimationFrame(drawAll); 
     countDown();
     endGame();
@@ -456,10 +469,10 @@ for(let x of markerSettings.xPositions){
 //Draw the car
 const car = {
   x: canvas.width/2,
-  y: canvas.height - 120,
-  width: 50,
-  height: 100,
-  speed : 20,
+  y: canvas.height - 200,
+  width: 80,
+  height: 150,
+  speed : 30,
 }
 
 const carImage = new Image();
@@ -471,15 +484,15 @@ document.addEventListener("keydown",(event) => {
         car.x -= car.speed //as along as within canvas, can move to left
       };
     } if (event.key==="ArrowRight"){
-      if(car.x+50<canvas.width){ //+50 to account for width of car
+      if(car.x+80<canvas.width){ //+80 to account for width of car
           car.x += car.speed //as long as within canvas, can move to the right
       }
     } if (event.key==="ArrowUp"){
-      if(car.y>0){ //+100 to account for height of car
+      if(car.y>0){ 
           car.y -= car.speed 
       }
     }  if (event.key==="ArrowDown"){
-        if(car.y+100<canvas.height){ //+100 to account for width of car
+        if(car.y+150<canvas.height){ //+200 to account for width of car
             car.y += car.speed 
         }
     }});
@@ -540,19 +553,19 @@ function drawAll(){
 
   //draw Car
   
-  ctx.fillStyle = "red";
-  ctx.fillRect(car.x, car.y, car.width, car.height);
-  
+    ctx.fillStyle = "red";
+    ctx.fillRect(carImage, car.y, car.width, car.height);
+    ctx.drawImage(carImage, car.x, car.y, car.width, car.height);
 
   //draw falling Circles
   for(let circle of circles.circlesArray){
       ctx.beginPath();
       ctx.arc(circle.x, circle.y, circles.radius ,0, Math.PI*2);
-      ctx.fillStyle = '#ffa69e';
+      ctx.fillStyle = '#da2323';
       ctx.fill();
 
       //number inside each circle
-      ctx.fillStyle = 'black';
+      ctx.fillStyle = 'white';
       ctx.font = '35px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -574,6 +587,7 @@ function drawAll(){
         console.log('PlayerAnswer is' + playerAnswer)
       }
     }
+    if (gameOver) {return};
     startAnimation = requestAnimationFrame(drawAll);
     //nextLevel()
     endGame()

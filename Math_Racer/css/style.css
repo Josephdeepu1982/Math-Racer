@@ -1,13 +1,11 @@
 
 
-/* Boiler Plate */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* to hide/show pages */
 .page{
   /* display: none; */
   padding: 40px 20px;
@@ -21,7 +19,6 @@ body {
   min-height: 100vh;
 }
 
-/* Header (if used in future) */
 header {
   padding: 10px;
   background-color: #ff8c42;
@@ -86,7 +83,7 @@ nav a:hover {
   background-color: #d94a4a;
 }
 
-/* Heading */
+
 #mathRacerHeading{
   text-align: center;
   margin: 30px 0;
@@ -96,7 +93,6 @@ nav a:hover {
   font-size: 3rem;
   color: #ff3c38;
   text-shadow: 2px 2px #fff176;
-  /* animation: bounce 1.5s infinite alternate; */
 }
 
 #welcome-message, #get-ready  {
@@ -105,8 +101,6 @@ nav a:hover {
   text-shadow: 2px 2px #fff176;
 }
 
-
-/* Bounce Animation */
 @keyframes bounce {
   0%   { transform: translateY(0); }
   100% { transform: translateY(-10px); }
@@ -124,13 +118,53 @@ nav a:hover {
 .car-image {
   width: 200px;
   margin-bottom: 20px;
-  /* animation: zoomIn 1s ease-in-out; */
+  animation: zoomIn 1s ease-in-out;
 }
 
 /* Zoom In Animation */
 @keyframes zoomIn {
   0% { transform: scale(0); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+.difficulty-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tooltip-icon {
+  position: relative;
+  margin: 15px 0 5px;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+
+  position: absolute;
+  z-index: 1;
+  top: 120%; /* Below the icon */
+  left: 50%;
+  transform: translateX(-50%);
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tooltip-icon:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Form Container */
@@ -184,7 +218,7 @@ nav a:hover {
 }
 
 
-/* #game-header {
+#game-header {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -194,7 +228,7 @@ nav a:hover {
   font-size: 1.1rem;
   font-weight: bold;
   border-bottom: 3px solid #ff686b;
-} */
+}
 
 #game-canvas {
   background-color: #616464;
@@ -288,6 +322,7 @@ nav a:hover {
   color: white;
   border: none;
   padding: 12px 20px;
+  margin: 25px 0 ;
   border-radius: 10px; 
   font-size: 1.1rem;
   cursor: pointer;
