@@ -54,6 +54,7 @@ const restartButtonElement = document.getElementById("restartBtn");
 const homePageBtnElement = document.getElementById("homePageBtn");
 
 /*-------------------------------- Functions --------------------------------*/
+
 //function to hide/show pages 
 function loadSite(){
     if (showLandingPage){
@@ -80,14 +81,15 @@ function loadSite(){
   }
   loadSite(); //load site based on flags above
 
-//Capture Player Name, Difficulty selected & load instructions screen
+
+//Capture & format Player Name, sets the Difficulty level & load instructions screen
 handlePlayerInput = () => {
   const nameInput = playerNameInputElement.value
 
   let formattedName = nameInput.trim().toLowerCase().replace(/^\w/,c  => c.toUpperCase());
     if (formattedName === '') {
       formattedName = 'Racer'
-    } else{
+    } else {
     playerName = formattedName;}
     namePlayer.textContent = formattedName;
     console.log(formattedName)
@@ -103,7 +105,7 @@ handlePlayerInput = () => {
     return;
 };
 
-//Copy over appropreate difficuulty array
+//Sets math operators (Copy arrays) based on difficulty selected
 function diffcultySelected(){
   if (difficultySelectElement.value === "easy"){
     operators = [...difficultyEasy];
@@ -114,7 +116,7 @@ function diffcultySelected(){
   }
 };
 
-
+//initializes the game, countdown and animation
 function startGame() {
   showGamePage = true;
   showInstructionsPage = false;
@@ -127,49 +129,47 @@ function startGame() {
   drawAll();
 }
 
-
+//genrates random math question based on diffculty selected
 function mathChallenges () {
-const a = Math.floor(Math.random()*10);
-const b = Math.floor(Math.random()*10);
-let operator = operators[Math.floor(Math.random()*operators.length)];
-if(!operator){operator = '+'};
+  const a = Math.floor(Math.random()*10);
+  const b = Math.floor(Math.random()*10);
+  let operator = operators[Math.floor(Math.random()*operators.length)];
+  
+  if(!operator){operator = '+'};
+  if(operator === '+'){
+    question = `Question ${a}+${b} = ?`
+    correctAnswer = a + b;
+  } else if (operator === '-'){
+    question = `Question ${a}-${b} = ?`
+    correctAnswer = a - b;
+  } else if (operator === '*'){
+    question = `Question ${a}x${b} = ?`
+    correctAnswer = a * b;
+  } 
 
-if(operator === '+'){
-question = `Question ${a}+${b} = ?`
-correctAnswer = a + b;
-} else if (operator === '-'){
-question = `Question ${a}-${b} = ?`
-correctAnswer = a - b;
-} else if (operator === '*'){
-  question = `Question ${a}x${b} = ?`
-  correctAnswer = a * b;
-} 
+  const wrongAnswers = new Set(); //Set() ensures that all values are unique!. create a set using the Set constructor:
+  //I want to keep update the set, until I have 3 unique wrong answers. use array.size with set()
 
-const wrongAnswers = new Set(); //Set() ensures that all values are unique!. create a set using the Set constructor:
+  while (wrongAnswers.size<3){ 
+  let wrong;
+  if (operator === '+'){
+      wrong = Math.floor(Math.random()*19) //max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
+    } else if(operator === '-'){
+      wrong = Math.floor(Math.random()*19)-9 //extremes are -9 and +9
+    } else if(operator === '*'){
+      wrong = Math.floor(Math.random()*80) //max possible 9*9 = 81
+    } 
+    if(wrong !== correctAnswer && wrong >= 0) { 
+      wrongAnswers.add(Math.floor(wrong)); //ensures answers are integers
+    }
+  }
 
-//I want to keep update the set, until I have 3 unique wrong answers. use array.size with set()
+  //I want to copy both correct and wrong answers into a single array
+  //.sort() => math.random() - 0.5) randomly shuffles the answers in the array
+  // math.Random() gives a value between 0 - 1, The compare fucntion of array.sort(return a-b) gives a -ve or +ve number. if -ve the the compare fucntion swaps the two elements; if +ve the compare function does not swap. 
+  const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() - 0.5);
 
-while (wrongAnswers.size<3){ //counter prevents infinite loop
-let wrong;
-
-if (operator === '+'){
-  wrong = Math.floor(Math.random()*19) //max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
-} else if(operator === '-'){
-  wrong = Math.floor(Math.random()*19)-9 //extremes are -9 and +9
-} else if(operator === '*'){
-  wrong = Math.floor(Math.random()*80) //max possible 9*9 = 81
-} 
-if(wrong !== correctAnswer && wrong >= 0) { 
-  wrongAnswers.add(Math.floor(wrong)); //ensures answers are integers
-}
-}
-
-//I want to copy both correct and wrong answers into a single array
-//.sort() => math.random() - 0.5) randomly shuffles the answers in the array
-// math.Random() gives a value between 0 - 1, The compare fucntion of array.sort(return a-b) gives a -ve or +ve number. if -ve the the compare fucntion swaps the two elements; if +ve the compare function does not swap. 
-const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() - 0.5);
-
-    return { 
+  return { 
       question,
       correctAnswer,
       options: answerOptions,
@@ -177,12 +177,10 @@ const answerOptions = [...wrongAnswers,correctAnswer].sort(() => Math.random() -
     
 };
 
-
-
-let challenge = mathChallenges(); //save question, answer and wrongoptions to a variable that contains an object {question:xxx, correctAnswer: c, options: [x,y,z,c]}
-console.log(challenge.correctAnswer);
-//display question below game canvas
-questionParagraphElement.textContent = challenge.question;
+  let challenge = mathChallenges(); //save question, answer and wrongoptions to a variable that contains an object {question:xxx, correctAnswer: c, options: [x,y,z,c]}
+  console.log(challenge.correctAnswer);
+ 
+  questionParagraphElement.textContent = challenge.question;  //display question below game canvas
 
 
     //I want to compare the correct answer against the collided ball
@@ -190,27 +188,26 @@ questionParagraphElement.textContent = challenge.question;
     //I want to update the score for every correct answer
     //I want to update the current streak for every current answer
 
-    
-    function compareAnswers(){
-      if (!challenge) return; // Prevents error if challenge is null
-      if(isCollision){
-        if (playerAnswer === challenge.correctAnswer){
-          correctAnswers.push(challenge.question);
-          currentStreak +=1;
-          score+=10
-          fiveStreak();
+  function compareAnswers(){
+    if (!challenge) return; // Prevents error if challenge is null
+    if(isCollision){
+      if (playerAnswer === challenge.correctAnswer){
+        correctAnswers.push(challenge.question);
+        currentStreak +=1;
+        score+=10
+        fiveStreak();
 
-          scoreElement.textContent = score;
-          currentStreakElement.textContent = currentStreak;
-          questionParagraphElement.textContent = 'Good Job!';
+        scoreElement.textContent = score;
+        currentStreakElement.textContent = currentStreak;
+        questionParagraphElement.textContent = 'Good Job!';
 
-          setTimeout(()=>{
-            resetGame();
-            drawAll(); //restart animation
-            nextLevel();
-          },1000);
+        setTimeout(()=>{
+          resetGame();
+          drawAll(); //restart animation
+          nextLevel();
+        },1000);
 
-        } else if (playerAnswer !== challenge.correctAnswer){
+      } else if (playerAnswer !== challenge.correctAnswer){
           wrongAnswers.push(challenge.question);
           questionParagraphElement.textContent = 'Try Again!'
           lives = Math.max(0, lives-1);
@@ -223,70 +220,61 @@ questionParagraphElement.textContent = challenge.question;
             resetGame();
             drawAll(); //restart animation
           },1000);
-        }}
-      };
+      }}
+    };
 
+    //Increases game difficulty (speed, level) 
     function nextLevel(){
       if(score>=50 && currentLevel === 1){
-        currentLevel = 2;
-        renderLevel();
-        circles.speed = 3;
-        markerSettings.Speed = 3;
-        timeLeft = 60;
-        timerElement.textContent = timeLeft;
-        paused = false;
-        
-        //questionParagraphElement.textContent = "Level 2! Timer Reset!";
-        //cancelAnimationFrame(startAnimation); //pause animation
-
+          currentLevel = 2;
+          renderLevel();
+          circles.speed = 3;
+          markerSettings.Speed = 3;
+          timeLeft = 60;
+          timerElement.textContent = timeLeft;
+          paused = false;
+        //1 sec delay before showing the next question
         setTimeout(() => {
-        questionParagraphElement.textContent = challenge.question;
-        //startAnimation = requestAnimationFrame(drawAll); 
-        //countDown()
-      },1000); //1 sec delay before showing the next question
+          questionParagraphElement.textContent = challenge.question;
+        },1000);
       } else if(score>=100 && currentLevel === 2){
-        currentLevel = 3;
-        renderLevel();
-        circles.speed=4;
-        markerSettings.Speed = 4;
-        timeLeft = 60;
-        timerElement.textContent = timeLeft;
-        paused = false;
-        
-        //questionParagraphElement.textContent = "Level 3! Timer Reset!";
-        //cancelAnimationFrame(startAnimation); //pause animation
-      
+          currentLevel = 3;
+          renderLevel();
+          circles.speed=4;
+          markerSettings.Speed = 4;
+          timeLeft = 60;
+          timerElement.textContent = timeLeft;
+          paused = false;
+
         setTimeout(()=>{
-        questionParagraphElement.textContent = challenge.question;
-        //startAnimation = requestAnimationFrame(drawAll); 
-        //countDown()
+          questionParagraphElement.textContent = challenge.question;
         },1000);
       }
     }
-    //nextLevel();
-
+   
+    //Resets the falling circles and generates a new math challenge.
     function resetGame() {
       cancelAnimationFrame(startAnimation); //pause animation
       challenge = mathChallenges(); //generates a new challenge
       questionParagraphElement.textContent = challenge.question;
+      
       //reinitilize circles drop down
       circles.circlesArray = []; 
       for (let i=0; i<circles.xAxis.length; i++){
-      circles.circlesArray.push({
-      x:circles.xAxis[i],
-      y: Math.random()*-canvas.height, 
-      value: challenge.options[i], 
+        circles.circlesArray.push({
+        x:circles.xAxis[i],
+        y: Math.random()*-canvas.height, 
+        value: challenge.options[i], 
       })};
     }
 
-
+    //countdown and end game when time runs out
     function countDown(){
       if(paused){
         return;
       }
       if(timeLeft>0){
         timeLeft -=1;
-
         timerElement.textContent = timeLeft
         countdownTimerId = setTimeout(countDown,1000);
         console.log('Timeleft:' + timeLeft);
@@ -294,41 +282,39 @@ questionParagraphElement.textContent = challenge.question;
         endGame();
       }
     }
-    //countDown()
-
-  
-
+    
+    //end of the game when time or lives run out.
     function endGame(){
       if (!gameOver && lives === 0){
-        gameOver = true;
-        console.log("Game Over");
-        cancelAnimationFrame(startAnimation); //pause animation
-        questionParagraphElement.textContent = "Game Over!";
-        paused = true;
-        showSummaryPage();
-        return;
-      } 
+          gameOver = true;
+          console.log("Game Over");
+          cancelAnimationFrame(startAnimation); //pause animation
+          questionParagraphElement.textContent = "Game Over!";
+          paused = true;
+          showSummaryPage();
+          return;
+        } 
       if(!gameOver && timeLeft === 0){
-        gameOver = true;
-        console.log("Time's Up!");
-        cancelAnimationFrame(startAnimation); //pause animation
-        questionParagraphElement.textContent = "Time's Up!";
-        showSummaryPage();
-        return;
+          gameOver = true;
+          console.log("Time's Up!");
+          cancelAnimationFrame(startAnimation); //pause animation
+          questionParagraphElement.textContent = "Time's Up!";
+          showSummaryPage();
+          return;
       }
     }
 
-
+    // player gets an extra life after 5 correct answers in a row.
     function fiveStreak(){
       if(currentStreak === 5){
-        lives += 1;
-        livesElement.textContent = lives;
-        currentStreak = 0;
-        questionParagraphElement.textContent = "Life Added!";
-        console.log('Added lives is:' + lives)
+          lives += 1;
+          livesElement.textContent = lives;
+          currentStreak = 0;
+          questionParagraphElement.textContent = "Life Added!";
       } 
     }
 
+    //Resets game to initial state.
     function resetGameState(){
         score = 0;
         lives = 3;
@@ -351,22 +337,23 @@ questionParagraphElement.textContent = challenge.question;
         cancelAnimationFrame(startAnimation);
         clearTimeout(countdownTimerId); 
         loadSite();
-    }
+      }
 
-
+    //Pause or Resumes the Game
     handlePauseBtn = () => {
       if(!paused){
-        cancelAnimationFrame(startAnimation); //pause animation
-        paused = true;
-        pauseBtnElement.textContent = "Resume";
-      } else {
-        paused = false;
-        pauseBtnElement.textContent = "Pause";
-        drawAll();
-        countDown();
-      } 
+          cancelAnimationFrame(startAnimation); //pause animation
+          paused = true;
+          pauseBtnElement.textContent = "Resume";
+        } else {
+          paused = false;
+          pauseBtnElement.textContent = "Pause";
+          drawAll();
+          countDown();
+        } 
       };
 
+      //reset the game 
     handleResetBtn = () => {
       resetGameState();
       renderLevel();
@@ -375,6 +362,7 @@ questionParagraphElement.textContent = challenge.question;
       countDown();
     }
 
+    //Quits the game and return to the landing page
     handleQuitBtn = () => {
       showInstructionsPage = false;
       showLandingPage = true;
@@ -387,34 +375,33 @@ questionParagraphElement.textContent = challenge.question;
       loadSite();
     }
 
+    //Shows the summary page
     function showSummaryPage(){
       gamePage.style.display = 'none';
-      summaryPage.style.display = 'block';
-      
+      summaryPage.style.display = 'block';  
       totalPoints.textContent = score;
 
       correctAnswers.forEach(answer => {
-      const li = document.createElement('li');
-      li.textContent = answer;
-      correctAnswersList.appendChild(li);
+        const li = document.createElement('li');
+        li.textContent = answer;
+        correctAnswersList.appendChild(li);
       });
   
       wrongAnswers.forEach(answer => {
-      const li = document.createElement('li');
-      li.textContent = answer;
-      wrongAnswersList.appendChild(li);
+        const li = document.createElement('li');
+        li.textContent = answer;
+        wrongAnswersList.appendChild(li);
       });
-      console.log('Summary page shown!');
       }
   
-
+      //shows the current level
       function renderLevel() {
           const levelContainer = document.getElementById('level-container');
-            levelContainer.innerHTML = '';
-            for (let i = 0; i < currentLevel; i++) {
-            const star = document.createElement('span');
-            star.textContent = '⭐';
-            levelContainer.appendChild(star);
+          levelContainer.innerHTML = '';
+          for (let i = 0; i < currentLevel; i++) {
+          const star = document.createElement('span');
+          star.textContent = '⭐';
+          levelContainer.appendChild(star);
           }
         }
         
@@ -428,17 +415,14 @@ pauseBtnElement.addEventListener("click", handlePauseBtn);
 resetBtnElement.addEventListener("click",handleResetBtn);
 quitBtnElement.addEventListener("click",handleQuitBtn);
 homePageBtnElement.addEventListener("click",handleQuitBtn);
-// const quitBtnElement = document.getElementById("quitBtn");
-// const homePageBtnElement = document.getElementById("homePageBtn");
 
 document.addEventListener("keydown", (event) => {
   const keysToPrevent = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
-  
   if (keysToPrevent.includes(event.key)) {
-    event.preventDefault(); // stops page scrolling!
-  }});
+      event.preventDefault(); // stops page scrolling when up/down arriw keys are pressed. 
+    }});
 
-  restartButtonElement.addEventListener('click',() => {
+restartButtonElement.addEventListener('click',() => {
     showInstructionsPage = false;
     showLandingPage = false;
     showGamePage = true;
@@ -495,21 +479,19 @@ document.addEventListener("keydown",(event) => {
       };
     } if (event.key==="ArrowRight"){
       if(car.x+80<canvas.width){ //+80 to account for width of car
-          car.x += car.speed //as long as within canvas, can move to the right
+        car.x += car.speed //as long as within canvas, can move to the right
       }
     } if (event.key==="ArrowUp"){
       if(car.y>0){ 
-          car.y -= car.speed 
+        car.y -= car.speed 
       }
     }  if (event.key==="ArrowDown"){
         if(car.y+150<canvas.height){ //+200 to account for width of car
-            car.y += car.speed 
+          car.y += car.speed 
         }
     }});
 
   
-
-
 //circles 
 
 const circles = {
@@ -521,10 +503,10 @@ const circles = {
 
 //for each X axis value, i want to generate one circle at randomised y axis positions. The circles contain the answer options both correct and incorrect 
 for (let i=0; i<circles.xAxis.length; i++){
-  circles.circlesArray.push({
-    x:circles.xAxis[i],
-    y: Math.random()*-canvas.height, //circles start above the visible screen, instead of abruptly appearing mid-way or at the bottom.
-    value: challenge.options[i], //assign one value per circle from shuffled options array: [x,y,z,c], so circlesArray contains [{x:0, y:0, value:0};{x:0, y:0, value:0};{x:0, y:0, value:0}; ] 
+    circles.circlesArray.push({
+      x:circles.xAxis[i],
+      y: Math.random()*-canvas.height, //circles start above the visible screen, instead of abruptly appearing mid-way or at the bottom.
+      value: challenge.options[i], //assign one value per circle from shuffled options array: [x,y,z,c], so circlesArray contains [{x:0, y:0, value:0};{x:0, y:0, value:0};{x:0, y:0, value:0}; ] 
   })
 }
 
@@ -599,8 +581,5 @@ function drawAll(){
     }
     if (gameOver) {return};
     startAnimation = requestAnimationFrame(drawAll);
-    //nextLevel()
     endGame()
   }
-
-//drawAll();
