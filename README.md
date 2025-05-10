@@ -65,6 +65,19 @@ Presentation Material: [Google Slides](https://docs.google.com/presentation/d/1C
 
 ---
 
+## ⚒️  Future Improvements
+- Report card for parents
+- Show values of wrong answers in Summary page and tips on getting the correct answer
+- Add animations for game states
+- Improve visibility of game components like lives, Win streak & level
+
+---
+
+## 📖  Image Refrences
+- [pngtree.com](https://pngtree.com/).
+
+---
+
 Happy Racing! 🏁 
 
 ---
