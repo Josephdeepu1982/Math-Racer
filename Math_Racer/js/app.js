@@ -123,17 +123,17 @@ function startGame() {
   showLandingPage = false;
   displaySummaryPage = false;
   paused = false;
-  loadSite();
-  mathChallenges();
-  countDown()
-  drawAll();
+  loadSite();  //shows the game page
+  mathChallenges(); //generates a random math question
+  countDown(); //starts 60 sec timer
+  drawAll(); //render game canvas and starts the animation loop
 }
 
 //genrates random math question based on diffculty selected
 function mathChallenges () {
   const a = Math.floor(Math.random()*10);
   const b = Math.floor(Math.random()*10);
-  let operator = operators[Math.floor(Math.random()*operators.length)];
+  let operator = operators[Math.floor(Math.random()*operators.length)]; //Selects a random operator from operator array
   
   if(!operator){operator = '+'};
   if(operator === '+'){
@@ -153,14 +153,14 @@ function mathChallenges () {
   while (wrongAnswers.size<3){ 
   let wrong;
   if (operator === '+'){
-      wrong = Math.floor(Math.random()*19) //max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
+      wrong = Math.floor(Math.random()*19) //random generation of wrong answer for addition question. max possible 9+9 is 18. *19 ensures that the wrong number is between 0 to 18
     } else if(operator === '-'){
       wrong = Math.floor(Math.random()*19)-9 //extremes are -9 and +9
     } else if(operator === '*'){
       wrong = Math.floor(Math.random()*80) //max possible 9*9 = 81
     } 
     if(wrong !== correctAnswer && wrong >= 0) { 
-      wrongAnswers.add(Math.floor(wrong)); //ensures answers are integers
+      wrongAnswers.add(Math.floor(wrong)); //ensures correct answers are not added to the wrong answer set, and filter out any negative numbers
     }
   }
 
@@ -192,7 +192,7 @@ function mathChallenges () {
     if (!challenge) return; // Prevents error if challenge is null
     if(isCollision){
       if (playerAnswer === challenge.correctAnswer){
-        correctAnswers.push(challenge.question);
+        correctAnswers.push(challenge.question);//Adds the question to a list of correctly answered ones.
         currentStreak +=1;
         score+=10
         fiveStreak();
@@ -208,7 +208,7 @@ function mathChallenges () {
         },1000);
 
       } else if (playerAnswer !== challenge.correctAnswer){
-          wrongAnswers.push(challenge.question);
+          wrongAnswers.push(challenge.question); 
           questionParagraphElement.textContent = 'Try Again!'
           lives = Math.max(0, lives-1);
           livesElement.textContent = lives
